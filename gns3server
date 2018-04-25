@@ -1,0 +1,60 @@
+#!/bin/bash
+echo '========================================='
+echo '++++++++++++'
+echo 'UPDATING THE SYSTEMS=================='
+echo '++++++++++++'
+echo '========================================='
+#update the system
+sudo apt-get -y update
+echo '========================================='
+echo '++++++++++++'
+echo 'INSTALLING DEPENDENCIES=================='
+echo '++++++++++++'
+echo '========================================='
+sudo apt-get -y install python3‐setuptools python3‐pyqt4 python3‐ws4py python3‐netifaces python-dev && \ 
+sudo apt-get -y install cmake libelf‐dev uuid‐dev libpcap‐dev
+echo '========================================='
+echo '++++++++++++'
+echo 'DOWNLOADING GNS3=================='
+echo '++++++++++++'
+echo '========================================='
+wget https://github.com/GNS3/gns3-gui/releases/download/v2.1.4/GNS3-2.1.4.source.zip && \
+unzip GNS3-*-source.zip
+echo '========================================='
+echo '++++++++++++'
+echo 'INSTALLING DYNAMIPS======================'
+echo '++++++++++++'
+echo '========================================='
+unzip dynamips-0.2.14.zip
+cd  dynamips-0.2.14 && \
+mkdir build
+cd build && \
+cmake ..
+make
+sudo make install
+sudo setcap cap_net_admin,cap_net_raw=ep /usr/local/bin/dynamips
+cd ../..
+echo '========================================='
+echo '++++++++++++'
+echo 'INSTALL GNS3 SERVER======================'
+echo '++++++++++++'
+echo '========================================='
+unzip gns3-server-1.3.7.zip && \
+cd gns3-server-1.3.7
+sudo python3 setup.py install
+echo '========================================='
+echo '++++++++++++'
+echo 'INSTALL UBRIDGE======================'
+echo '++++++++++++'
+echo '========================================='
+git clone git://github.com/GNS3/ubridge.git
+cd ubridge
+make
+make install
+echo '========================================='
+echo '++++++++++++'
+echo 'RUN GNS3 SERVER======================'
+echo '++++++++++++'
+echo '========================================='
+sudo sysv-rc-conf --level 135 gns3server on
+gns3server
